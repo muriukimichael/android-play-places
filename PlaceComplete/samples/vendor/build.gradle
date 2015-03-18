@@ -1,0 +1,27 @@
+List<String> samples = [
+"google/gmscore/PlaceComplete"
+]
+
+List<String> taskNames = [
+    "clean",
+    "refresh",
+    "build",
+    "emitAnt",
+    "emitGradle",
+    "emitBrowseable",
+    "emitGradleZip",
+]
+
+taskNames.each { taskName ->
+    def task = project.hasProperty(taskName) ? project.tasks[taskName] : project.task(taskName)
+    println task
+    samples.each { sample ->
+        File sampleDir = new File(sample)
+        task.dependsOn project.task([type: GradleBuild], "${sample}_${taskName}", {
+            buildFile = "${sample}/build.gradle"
+            dir = sample
+            tasks = [taskName]
+        })
+    }
+}
+
